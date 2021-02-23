@@ -14,8 +14,30 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http.response import StreamingHttpResponse
 from django.urls import path
 
+from django.views import View
+import time
+
+
+class SSEView(View):
+    def get(self, request):
+        def stream():
+            while True:
+                yield f"data: minha mensagem\n\n"
+                time.sleep(3)
+
+        stream_resp = StreamingHttpResponse(stream(), content_type="text/event-stream")
+
+        stream_resp["Connection"] = "Keep-Alive"
+        stream_resp["Cache-Control"] = "no-cache"
+        stream_resp["Keep-Alive"] = "timeout=9007199254740991"
+
+        return stream_resp
+
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("sse", SSEView.as_view()),
+    path("admin/", admin.site.urls),
 ]
