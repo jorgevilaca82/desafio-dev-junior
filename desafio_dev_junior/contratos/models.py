@@ -23,7 +23,7 @@ class Empresa(models.Model):
     telefone = models.CharField(_("Telefone"), max_length=50)
 
     def __str__(self):
-        return self.pk
+        return f"{self.razao_social} ({self.cnpj})"
 
 
 class TipoContrato(models.IntegerChoices):
@@ -81,4 +81,5 @@ class Contrato(models.Model):
     prazos = models.TextField(_("Prazos"))
 
     def __str__(self):
-        return self.pk
+        seq = str(self.pk).zfill(4)
+        return f"{self.get_tipo_display()} ({seq})"
